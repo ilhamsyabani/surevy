@@ -549,6 +549,7 @@ class ComposerStaticInitb2b02d8bc4f759387a017f0c05f0bde0
         'App\\Http\\Controllers\\InstansionController' => __DIR__ . '/../..' . '/app/Http/Controllers/InstansionController.php',
         'App\\Http\\Controllers\\RangeController' => __DIR__ . '/../..' . '/app/Http/Controllers/RangeController.php',
         'App\\Http\\Controllers\\ResultController' => __DIR__ . '/../..' . '/app/Http/Controllers/ResultController.php',
+        'App\\Http\\Controllers\\ReviewController' => __DIR__ . '/../..' . '/app/Http/Controllers/ReviewController.php',
         'App\\Http\\Controllers\\TestController' => __DIR__ . '/../..' . '/app/Http/Controllers/TestController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\AdminMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/AdminMiddleware.php',

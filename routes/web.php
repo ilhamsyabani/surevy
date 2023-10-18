@@ -17,7 +17,7 @@ use App\Http\Controllers\TestController;
 */
 
 Route::get('/', function () {
-    return redirect()->route('dashboard.index');
+    return redirect()->route('client.test');
 });
 Route::get('welcome', function () {
     return view('home');

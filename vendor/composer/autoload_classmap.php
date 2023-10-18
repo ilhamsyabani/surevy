@@ -29,6 +29,7 @@ return array(
     'App\\Http\\Controllers\\InstansionController' => $baseDir . '/app/Http/Controllers/InstansionController.php',
     'App\\Http\\Controllers\\RangeController' => $baseDir . '/app/Http/Controllers/RangeController.php',
     'App\\Http\\Controllers\\ResultController' => $baseDir . '/app/Http/Controllers/ResultController.php',
+    'App\\Http\\Controllers\\ReviewController' => $baseDir . '/app/Http/Controllers/ReviewController.php',
     'App\\Http\\Controllers\\TestController' => $baseDir . '/app/Http/Controllers/TestController.php',
     'App\\Http\\Kernel' => $baseDir . '/app/Http/Kernel.php',
     'App\\Http\\Middleware\\AdminMiddleware' => $baseDir . '/app/Http/Middleware/AdminMiddleware.php',
