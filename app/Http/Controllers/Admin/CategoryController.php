@@ -68,18 +68,55 @@ class CategoryController extends Controller
 
     public function edit(Category $category): View
     {
-        return view('admin.categories.edit', compact('category'));
+        $feedbacks = $category->categoryFeedback;
+        return view('admin.categories.edit', compact('category', 'feedbacks'));
     }
 
     public function update(CategoryRequest $request, Category $category): RedirectResponse
     {
-        $category->update($request->validated());
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'score.*' => 'required|string|max:255',
+            'min.*' => 'required|integer',
+            'max.*' => 'required|integer',
+            'feedback.*' => 'required|string|max:255',
+        ]);
+       
+        $feedbackRanges = [];
+        foreach ($request->input('min') as $key => $min) {
+            $max = $request->input('max')[$key];
+            if ($max < $min) {
+                return back()->withErrors(['feedback' => 'Feedback range maximum value must be greater than minimum value.']);
+            }
+
+            foreach ($feedbackRanges as $range) {
+                if (($min >= $range['min'] && $min <= $range['max']) || ($max >= $range['min'] && $max <= $range['max'])) {
+                    return back()->withErrors(['feedback' => 'Feedback ranges cannot overlap.']);
+                }
+            }
+
+            $feedbackRanges[] = ['min' => $min, 'max' => $max];
+        }
+
+        $category->update(['name' => $request->input('name')]);
+
+        foreach ($request->input('score') as $key => $score) {
+            $min = $request->input('min')[$key];
+            $max = $request->input('max')[$key];
+            $feedback = $request->input('feedback')[$key];
+
+            Feedback::updateOrCreate(
+                ['categori_id' => $category->id, 'score' => $score],
+                ['min' => $min, 'max' => $max, 'feedback' => $feedback]
+            );
+        }
 
         return redirect()->route('admin.categories.index')->with([
-            'message' => 'successfully updated !',
+            'message' => 'Successfully updated!',
             'alert-type' => 'info'
         ]);
     }
+
 
     public function destroy(Category $category): RedirectResponse
     {

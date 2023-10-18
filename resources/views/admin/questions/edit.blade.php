@@ -38,7 +38,16 @@
                             @endforeach
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">{{ __('Save')}}</button>
+                    <div class="form-group">
+                        @foreach($options as $index => $option)
+                            <label for="option_text{{ $index + 1 }}">{{ __('Sekla ' . ($index + 1)) }}</label>
+                            <input type="text" class="form-control" id="option_text{{ $index + 1 }}" placeholder="{{ __('option text') }}" name="option_text[]" value="{{ old('option_text', $option->option_text) }}" />
+                            <input type="hidden" class="form-control" id="points{{ $index + 1 }}" name="point[]" value="{{ $index + 1 }}" />
+                            <div id="emailHelp" class="form-text">pilihan ini bernilai {{ $index + 1 }} dari sekala 1 sampai 4</div>
+                        @endforeach
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block">{{ __('Update')}}</button>
                 </form>
             </div>
         </div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Oct 18, 2023 at 02:13 AM
+-- Generation Time: Oct 18, 2023 at 12:52 PM
 -- Server version: 5.7.39
 -- PHP Version: 7.4.33
 
@@ -65,7 +65,9 @@ CREATE TABLE `category_results` (
 --
 
 INSERT INTO `category_results` (`id`, `result_id`, `category_id`, `feedback_id`, `total_points`, `attachment`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 4, 13, 'uploads/c60hZyC3PNDSFCBAzj92Hog0BSc4pMGRXTYPPkb2.pdf', '2023-10-17 18:47:17', '2023-10-17 18:57:56');
+(1, 1, 2, 4, 13, 'uploads/c60hZyC3PNDSFCBAzj92Hog0BSc4pMGRXTYPPkb2.pdf', '2023-10-17 18:47:17', '2023-10-17 18:57:56'),
+(2, 2, 2, 4, 14, 'uploads/LQcTX0TkuvL1K1JrAjylGOzIBGGNMwyFsrfCefIy.pdf', '2023-10-18 00:05:07', '2023-10-18 00:05:07'),
+(3, 2, 3, 7, 11, 'belum di isi', '2023-10-18 00:05:07', '2023-10-18 00:05:07');
 
 -- --------------------------------------------------------
 
@@ -143,6 +145,13 @@ CREATE TABLE `instansions` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `instansions`
+--
+
+INSERT INTO `instansions` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(1, 'SMA N 2 Cikarang Selatan', '2023-10-17 21:50:41', '2023-10-17 21:50:41');
+
 -- --------------------------------------------------------
 
 --
@@ -176,7 +185,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (14, '2023_10_13_071213_create_evidence_table', 1),
 (15, '2023_10_13_123957_create_instansions_table', 1),
 (16, '2023_10_14_113214_create_category_result_table', 1),
-(17, '2023_10_15_010923_create_question_results_table', 1);
+(17, '2023_10_15_010923_create_question_results_table', 1),
+(18, '2023_10_18_082926_create_reviews_table', 2);
 
 -- --------------------------------------------------------
 
@@ -280,7 +290,8 @@ INSERT INTO `permissions` (`id`, `title`, `created_at`, `updated_at`) VALUES
 (17, 'user_create', NULL, NULL),
 (18, 'user_edit', NULL, NULL),
 (19, 'user_view', NULL, NULL),
-(20, 'user_delete', NULL, NULL);
+(20, 'user_delete', NULL, NULL),
+(22, 'result_access', '2023-10-17 22:46:49', '2023-10-17 22:47:11');
 
 -- --------------------------------------------------------
 
@@ -321,7 +332,10 @@ INSERT INTO `permission_role` (`id`, `permission_id`, `role_id`, `created_at`, `
 (18, 18, 1, NULL, NULL),
 (19, 19, 1, NULL, NULL),
 (20, 20, 1, NULL, NULL),
-(21, 1, 2, NULL, NULL);
+(24, 19, 2, NULL, NULL),
+(46, 1, 4, NULL, NULL),
+(47, 16, 4, NULL, NULL),
+(48, 22, 4, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -393,7 +407,15 @@ INSERT INTO `question_results` (`id`, `category_result_id`, `question_id`, `opti
 (1, 1, 1, 4, 4, '2023-10-17 18:47:17', '2023-10-17 18:47:17'),
 (2, 1, 2, 7, 3, '2023-10-17 18:47:17', '2023-10-17 18:47:17'),
 (3, 1, 3, 11, 3, '2023-10-17 18:47:17', '2023-10-17 18:47:17'),
-(4, 1, 4, 15, 3, '2023-10-17 18:47:17', '2023-10-17 18:47:17');
+(4, 1, 4, 15, 3, '2023-10-17 18:47:17', '2023-10-17 18:47:17'),
+(5, 2, 1, 3, 3, '2023-10-18 00:05:07', '2023-10-18 00:05:07'),
+(6, 2, 2, 7, 3, '2023-10-18 00:05:07', '2023-10-18 00:05:07'),
+(7, 2, 3, 11, 3, '2023-10-18 00:05:07', '2023-10-18 00:05:07'),
+(8, 2, 4, 14, 2, '2023-10-18 00:05:07', '2023-10-18 00:05:07'),
+(9, 2, 5, 19, 3, '2023-10-18 00:05:07', '2023-10-18 00:05:07'),
+(10, 3, 6, 24, 4, '2023-10-18 00:05:07', '2023-10-18 00:05:07'),
+(11, 3, 7, 27, 3, '2023-10-18 00:05:07', '2023-10-18 00:05:07'),
+(12, 3, 8, 32, 4, '2023-10-18 00:05:07', '2023-10-18 00:05:07');
 
 -- --------------------------------------------------------
 
@@ -415,7 +437,33 @@ CREATE TABLE `results` (
 --
 
 INSERT INTO `results` (`id`, `user_id`, `total_points`, `status`, `created_at`, `updated_at`) VALUES
-(1, 1, 13, 'kirim', '2023-10-17 18:32:45', '2023-10-17 18:58:08');
+(1, 1, 13, 'simpan', '2023-10-17 18:32:45', '2023-10-17 18:58:08'),
+(2, 4, 25, 'simpan', '2023-10-18 00:05:07', '2023-10-18 00:12:03');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reviews`
+--
+
+CREATE TABLE `reviews` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `category_result_id` bigint(20) UNSIGNED NOT NULL,
+  `review` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `reviews`
+--
+
+INSERT INTO `reviews` (`id`, `user_id`, `category_result_id`, `review`, `created_at`, `updated_at`) VALUES
+(1, 5, 2, 'halo baik', '2023-10-18 02:36:11', '2023-10-18 02:36:11'),
+(2, 5, 2, 'halo baik', '2023-10-18 02:36:40', '2023-10-18 02:36:40'),
+(3, 5, 2, 'halo baik', '2023-10-18 02:36:55', '2023-10-18 02:36:55'),
+(4, 5, 2, 'halo baik', '2023-10-18 02:37:17', '2023-10-18 02:37:17');
 
 -- --------------------------------------------------------
 
@@ -436,7 +484,8 @@ CREATE TABLE `roles` (
 
 INSERT INTO `roles` (`id`, `title`, `created_at`, `updated_at`) VALUES
 (1, 'admin', NULL, NULL),
-(2, 'user', NULL, NULL);
+(2, 'user', NULL, NULL),
+(4, 'evaluator', '2023-10-17 23:28:08', '2023-10-17 23:28:08');
 
 -- --------------------------------------------------------
 
@@ -457,7 +506,9 @@ CREATE TABLE `role_user` (
 --
 
 INSERT INTO `role_user` (`id`, `role_id`, `user_id`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, NULL, NULL);
+(1, 1, 1, NULL, NULL),
+(5, 2, 4, NULL, NULL),
+(6, 4, 5, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -482,7 +533,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `instansion_id`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'admin@example.com', NULL, '$2y$10$LnMRAaOg9N98hsBgRZr6KOVqVcl6KMZ4F43U.hFRwWVMxHDxYo0Iy', NULL, NULL, NULL, NULL);
+(1, 'admin', 'admin@example.com', NULL, '$2y$10$LnMRAaOg9N98hsBgRZr6KOVqVcl6KMZ4F43U.hFRwWVMxHDxYo0Iy', NULL, NULL, NULL, NULL),
+(4, 'siti aminah', 'sitiaminah@mail.com', NULL, '$2y$10$lpUNYo.UAfzRZTDL4c6tX.1/aP98qsZWaywFqkxmD89UrIEkX5PBO', '1', NULL, '2023-10-17 23:27:38', '2023-10-17 23:27:38'),
+(5, 'Ilham syabani', 'syabani.ilhamsi@gmail.com', NULL, '$2y$10$X2w5VSvJuSrcn9VPmc6NNetLSwRE/BXXyJpPcQkypcNa.MJfYGY5m', '1', NULL, '2023-10-17 23:28:31', '2023-10-17 23:28:31');
 
 --
 -- Indexes for dumped tables
@@ -593,6 +646,13 @@ ALTER TABLE `results`
   ADD KEY `results_user_id_foreign` (`user_id`);
 
 --
+-- Indexes for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `reviews_category_result_id_foreign` (`category_result_id`);
+
+--
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
@@ -627,7 +687,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `category_results`
 --
 ALTER TABLE `category_results`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `evidence`
@@ -651,13 +711,13 @@ ALTER TABLE `feedback`
 -- AUTO_INCREMENT for table `instansions`
 --
 ALTER TABLE `instansions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `options`
@@ -669,13 +729,13 @@ ALTER TABLE `options`
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `permission_role`
 --
 ALTER TABLE `permission_role`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -693,31 +753,37 @@ ALTER TABLE `questions`
 -- AUTO_INCREMENT for table `question_results`
 --
 ALTER TABLE `question_results`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `results`
 --
 ALTER TABLE `results`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `role_user`
 --
 ALTER TABLE `role_user`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -763,6 +829,12 @@ ALTER TABLE `question_results`
 --
 ALTER TABLE `results`
   ADD CONSTRAINT `results_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_category_result_id_foreign` FOREIGN KEY (`category_result_id`) REFERENCES `category_results` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `role_user`

@@ -12,7 +12,7 @@ use App\Http\Requests\Admin\QuestionRequest;
 
 class QuestionController extends Controller
 {
-   
+
     public function index(): View
     {
         $questions = Question::all();
@@ -39,19 +39,17 @@ class QuestionController extends Controller
 
         $question = Question::create([
             'category_id' => $request->category_id,
-            'question_text'=>$request->question_text
+            'question_text' => $request->question_text
         ]);
-
-        
 
         $opsi = $request->option_text;
         $points = $request->point;
 
         foreach ($opsi as $key => $value) {
             Option::create([
-                'question_id'=> $question -> id,
-                'option_text'=> $value,
-                'points'=> $points[$key],
+                'question_id' => $question->id,
+                'option_text' => $value,
+                'points' => $points[$key],
             ]);
         }
 
@@ -70,18 +68,41 @@ class QuestionController extends Controller
     {
         $categories = Category::all()->pluck('name', 'id');
 
-        return view('admin.questions.edit', compact('question', 'categories'));
+        $options = $question->questionOptions;
+
+        return view('admin.questions.edit', compact('question', 'categories', 'options'));
     }
 
     public function update(QuestionRequest $request, Question $question): RedirectResponse
     {
-        $question->update($request->validated());
+        // Validate the request data
+        $request->validate([
+            'question_text' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'option_text.*' => 'required|string',
+            'point.*' => 'required|numeric',
+        ]);
+
+        // Update the question
+        $question->update([
+            'question_text' => $request->input('question_text'),
+            'category_id' => $request->input('category_id'),
+        ]);
+
+        // Update or create options
+        foreach ($request->input('option_text') as $key => $optionText) {
+            Option::updateOrCreate(
+                ['question_id' => $question->id, 'points' => $request->input('point')[$key]],
+                ['option_text' => $optionText]
+            );
+        }
 
         return redirect()->route('admin.questions.index')->with([
-            'message' => 'successfully updated !',
+            'message' => 'Successfully updated!',
             'alert-type' => 'info'
         ]);
     }
+
 
     public function destroy(Question $question): RedirectResponse
     {

@@ -20,6 +20,16 @@ class TestController extends Controller
 {
     public function index()
     {
+
+        foreach(auth()->user()->roles as $role){
+            if($role->title == "admin"){
+                return redirect()->route('dashboard.index');
+            }
+            if($role->title == "evaluator"){
+                return redirect()->route('dashboard.index');
+            }
+        }
+
         $categories = Category::whereHas('categoryQuestions')
             ->get();
 
