@@ -36,4 +36,9 @@ class CategoryResult extends Model
     {
         return $this->hasMany(QuestionResult::class);
     }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
 }

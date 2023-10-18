@@ -29,8 +29,10 @@
                                             <td>{{ $question->question->question_text }}</td>
                                             <td>{{ $question->points }}</td>
                                             @if ($loop->first)
-                                                <td rowspan="{{ $rowCount + 1 }}" style="text-align: center;"><p style="font-size:100px">{{ $category->feedback->score }}</p>
-                                                <p>{{ $category->feedback->feedback }}</p></td>
+                                                <td rowspan="{{ $rowCount + 1 }}" style="text-align: center;">
+                                                    <p style="font-size:100px">{{ $category->feedback->score }}</p>
+                                                    <p>{{ $category->feedback->feedback }}</p>
+                                                </td>
                                             @endif
                                         </tr>
                                     @endforeach
@@ -42,8 +44,11 @@
                             </table>
                             <div class="mt-4">
                                 <p>file yang sudah di upload<a href="{{ asset('storage/' . $category->attachment) }}"
-                                    class="pt-8 btn-link"
-                                    download>{{ $category->attachment }}</a><br/></p>
+                                        class="pt-8 btn-link" download>{{ $category->attachment }}</a><br /></p>
+                            </div>
+                            <div class="card-header">Feedback dari reviewer</div>
+                            <div class="card-body mb-4" style="background-color:#eefdee;">
+                                <p>{{optional($category->review)->review}}</p>
                             </div>
                         @endforeach
                     </div>

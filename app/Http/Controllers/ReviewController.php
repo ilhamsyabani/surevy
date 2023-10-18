@@ -21,6 +21,8 @@ class ReviewController extends Controller
        $results = Result::whereHas('user', function ($query) use ($instanceId) {
            $query->where('instansion_id', $instanceId);
        })->get();
+
+       
        
        // Kembalikan hasil ke view atau lakukan operasi lainnya
        return view('review.index', compact('results'));

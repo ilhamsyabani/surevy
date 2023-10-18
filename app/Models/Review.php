@@ -10,4 +10,9 @@ class Review extends Model
     use HasFactory;
 
     protected $guarded=[];
+
+    public function questionResult()
+    {
+        return $this->hasOne(QuestionResult::class);
+    }
 }

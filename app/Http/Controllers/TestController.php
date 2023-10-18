@@ -49,7 +49,9 @@ class TestController extends Controller
         if($result->status == "disetujui"){
             return redirect()->route('client.results.show', $result);
         }
-
+        if($result->status == "dikembalikan"){
+            return redirect()->route('client.results.show', $result);
+        }
         
     }
 
@@ -77,7 +79,6 @@ class TestController extends Controller
 
     public function store(StoreTestRequest $request)
     {
-
         $options = Option::find(array_values($request->input('questions')));
 
         $result = auth()->user()->userResults()->create([
@@ -150,7 +151,7 @@ class TestController extends Controller
         if ($request->aksi == "simpan") {
             return redirect()->route('client.test.edit',  $result->id);
         }
-        return redirect()->route('client.results.show',  $result->id);
+        return view('client.waiting');
     }
 
     
@@ -255,7 +256,7 @@ class TestController extends Controller
                 return redirect()->route('client.test.edit', $result);
             }
             if ($request->aksi == "kirim") {
-                return redirect()->route('client.results.show', $result);
+                return view('client.waiting');
             }
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
