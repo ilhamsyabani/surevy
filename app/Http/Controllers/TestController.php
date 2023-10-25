@@ -21,11 +21,11 @@ class TestController extends Controller
     public function index()
     {
 
-        foreach(auth()->user()->roles as $role){
-            if($role->title == "admin"){
+        foreach (auth()->user()->roles as $role) {
+            if ($role->title == "admin") {
                 return redirect()->route('dashboard.index');
             }
-            if($role->title == "evaluator"){
+            if ($role->title == "evaluator") {
                 return redirect()->route('dashboard.index');
             }
         }
@@ -37,22 +37,21 @@ class TestController extends Controller
 
 
         if (!$result) {
-        return view('client.test', compact('categories'));
+            return view('client.test', compact('categories'));
         }
-        if($result->status == "simpan"){
+        if ($result->status == "simpan") {
             $result_id = $result->id;
             return redirect()->route('client.test.edit',  $result_id);
         }
-        if($result->status == "kirim"){
+        if ($result->status == "kirim") {
             return view('client.waiting');
         }
-        if($result->status == "disetujui"){
+        if ($result->status == "disetujui") {
             return redirect()->route('client.results.show', $result);
         }
-        if($result->status == "dikembalikan"){
+        if ($result->status == "dikembalikan") {
             return redirect()->route('client.results.show', $result);
         }
-        
     }
 
     public function edit($result_id)
@@ -79,7 +78,9 @@ class TestController extends Controller
 
     public function store(StoreTestRequest $request)
     {
+
         $options = Option::find(array_values($request->input('questions')));
+
 
         $result = auth()->user()->userResults()->create([
             'total_points' => $options->sum('points'),
@@ -92,23 +93,27 @@ class TestController extends Controller
         // Mengelompokkan pertanyaan berdasarkan kategori soal
         $questionsByCategory = $questions->groupBy('category_id');
 
+
         // Menyimpan data kategori hasil tes ke dalam tabel category_result
         foreach ($questionsByCategory as $categoryId => $categoryQuestions) {
             $totalPoints = 0;
+            $number = 0;
+            $soal = Question::where('category_id', $categoryId)->count();
 
             foreach ($categoryQuestions as $question) {
+
                 $selectedOptionId = $request->input('questions')[$question->id];
+
                 $selectedOption = $options->where('id', $selectedOptionId)->first();
                 $totalPoints += $selectedOption->points;
+                $number += 1;
             }
 
-            $feedback = Feedback::where('categori_id', $categoryId)
+    
+            $rawfeedback = Feedback::where('categori_id', $categoryId)
                 ->where('min', '<=', $totalPoints)
                 ->where('max', '>=', $totalPoints)
                 ->first();
-            if (!$feedback) {
-                $feedback = Feedback::find(1);
-            }
 
             $path = 'kosong';
             if ($request->hasFile('attachment')) {
@@ -120,6 +125,17 @@ class TestController extends Controller
                     $path = 'belum di isi';
                 }
             }
+
+            $number = 3;
+            $path = "sudah ada";
+            dd($soal);
+            if ($number = $soal) {
+                $feedback = $rawfeedback;
+            }else{
+                $feedback = Feedback::find(1);
+            }
+          
+            dd($feedback);
 
             $categoryResult = new CategoryResult([
                 'total_points' => $totalPoints,
@@ -154,7 +170,7 @@ class TestController extends Controller
         return view('client.waiting');
     }
 
-    
+
     public function update(Request $request, $result)
     {
         $resultData = Result::find($result);

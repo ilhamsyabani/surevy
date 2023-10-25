@@ -6,6 +6,7 @@ use App\Models\Instansion;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Admin\InstansionRequest;
 
 class InstansionController extends Controller
@@ -45,9 +46,14 @@ class InstansionController extends Controller
 
     public function update(Request $request, Instansion $instansion): RedirectResponse
     {
-        $instansion->update($request->validated());
+        // $validator = Validator::make($request->all(), [
+        //     'name' => 'required',
 
-        return redirect()->route('instansions.index')->with([
+        // ]);
+        
+        $instansion->update($request->all());
+
+        return redirect()->route('admin.instansions.index')->with([
             'message' => 'successfully updated !',
             'alert-type' => 'info'
         ]);

@@ -23,6 +23,7 @@ class CreateCategoryResultTable extends Migration
             $table->foreignIdFor(Feedback::class)->constrained()->cascadeOnDelete();
             $table->integer('total_points')->default(0);
             $table->string('attachment')->nullable();
+            $table->string('status');
             $table->timestamps();
         });
     }

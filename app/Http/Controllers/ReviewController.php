@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategoryResult;
 use App\Models\Result;
 use App\Models\Review;
 use Illuminate\Http\Request;
@@ -35,6 +36,7 @@ class ReviewController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        
         $review = new Review([
             'category_result_id' => $request->result_id,
             'user_id' => auth()->id(),
@@ -42,6 +44,10 @@ class ReviewController extends Controller
         ]);
 
         $review->save();
+        
+        $categoriResult = CategoryResult::find($request->result_id,);
+        dd($categoriResult);
+        
 
         return redirect()->route('admin.review.index')->with([
             'message' => 'successfully created !',

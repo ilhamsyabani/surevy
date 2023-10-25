@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Range;
 use App\Models\Category;
+use App\Models\Feedback;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Admin\CategoryRequest;
-use App\Models\Feedback;
-use App\Models\Range;
 
 class CategoryController extends Controller
 {
@@ -28,10 +29,7 @@ class CategoryController extends Controller
     public function store(CategoryRequest $request): RedirectResponse
     {
 
-
-        $categori = Category::create($request->validated());
-
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'score' => 'required|array|min:1',
             'score.*' => 'required|string',
             'min' => 'required|array|min:1',
@@ -41,7 +39,11 @@ class CategoryController extends Controller
             'feedback' => 'required|array|min:1',
             'feedback.*' => 'required|string',
         ]);
-
+        
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $categori = Category::create($request->validated());
         $ranges = [];
 
         for ($i = 0; $i < count($request->score); $i++) {

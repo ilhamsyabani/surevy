@@ -17,8 +17,8 @@ class UserSeed extends Seeder
         $users = [
             [
                 'name'           => 'admin',
-                'email'          => 'admin@example.com',
-                'password'       => bcrypt('123'),
+                'email'          => 'adm.amiclc@gmail.com',
+                'password'       => bcrypt('1324'),
                 'remember_token' => null,
             ],
         ];
