@@ -98,44 +98,65 @@ class TestController extends Controller
         foreach ($questionsByCategory as $categoryId => $categoryQuestions) {
             $totalPoints = 0;
             $number = 0;
-            $soal = Question::where('category_id', $categoryId)->count();
+            $path = 'kosong';
+            $feedback =[];
 
             foreach ($categoryQuestions as $question) {
 
                 $selectedOptionId = $request->input('questions')[$question->id];
-
                 $selectedOption = $options->where('id', $selectedOptionId)->first();
                 $totalPoints += $selectedOption->points;
                 $number += 1;
             }
 
-    
+
             $rawfeedback = Feedback::where('categori_id', $categoryId)
                 ->where('min', '<=', $totalPoints)
                 ->where('max', '>=', $totalPoints)
                 ->first();
 
-            $path = 'kosong';
+            // $path = 'kosong';
+            // if ($request->hasFile('attachment')) {
+            //     $attachments = $request->file('attachment');
+            //     if (is_array($attachments) && array_key_exists($categoryId, $attachments)) {
+            //         $attachment = $attachments[$categoryId];
+            //         $path = $attachment->store('uploads', 'public');
+            //     } else {
+            //         $path = 'belum di isi';
+            //     }
+            // }
+
+            // $attachments = $request->file('attachment');
+            // if ($number === $soal && $attachments[$categoryId]) {
+            //     dd('lengkap');
+            //     $feedback = $rawfeedback;
+            // }else{
+            //     dd('tidak lengkap');
+            //     $feedback = Feedback::find(1);
+            // }
+
             if ($request->hasFile('attachment')) {
                 $attachments = $request->file('attachment');
                 if (is_array($attachments) && array_key_exists($categoryId, $attachments)) {
                     $attachment = $attachments[$categoryId];
                     $path = $attachment->store('uploads', 'public');
                 } else {
-                    $path = 'belum di isi';
+                    // Pengguna mengunggah file attachment, tetapi tidak ada file yang sesuai dengan kategori
+                    $path ='File attachment tidak diunggah.';
                 }
+            } else {
+                // Pengguna tidak mengunggah file attachment
+                $path ='File attachment tidak diunggah.';
             }
 
-            $number = 3;
-            $path = "sudah ada";
-            dd($soal);
-            if ($number = $soal) {
+            // Mengganti perbandingan ini dengan jumlah pertanyaan sebenarnya dalam kategori
+            $jumlahPertanyaan = Question::where('category_id', $categoryId)->count();
+
+            if ($number === $jumlahPertanyaan && $path !='File attachment tidak diunggah.') {
                 $feedback = $rawfeedback;
-            }else{
+            } else {
                 $feedback = Feedback::find(1);
             }
-          
-            dd($feedback);
 
             $categoryResult = new CategoryResult([
                 'total_points' => $totalPoints,
@@ -188,92 +209,107 @@ class TestController extends Controller
         // Mengelompokkan pertanyaan berdasarkan kategori soal
         $questionsByCategory = $questions->groupBy('category_id');
 
+        //++++++++++++++++++++++++
+        // Perbarui total_points pada tabel hasil ujian
+        $totalPoints = Option::whereIn('id', array_values($selectedOptions))->sum('points');
+        $resultData->update(['total_points' => $totalPoints]);
+        $resultData->update(['status' => $request->aksi]);
+
+        foreach ($questionsByCategory as $categoryId => $categoryQuestions) {
+            $totalPoint = 0;
+            $number = 0;
+
+            foreach ($categoryQuestions as $question) {
+                $selectedOptionId = $selectedOptions[$question->id];
+                $selectedOption = Option::find($selectedOptionId);
+                $totalPoint += $selectedOption->points;
+                $number += 1;
+            }
+
+            $rawfeedback = Feedback::where('categori_id', $categoryId)
+                ->where('min', '<=', $totalPoint)
+                ->where('max', '>=', $totalPoint)
+                ->first();
+
+            // Temukan atau buat kategori hasil ujian yang sudah ada
+            $categoryResult = CategoryResult::where('result_id', $result)
+                ->where('category_id', $categoryId)
+                ->first();
+
+            $attachmentPath = $categoryResult->attachment;
+
+            if ($request->hasFile('attachment')) {
+                $attachments = $request->file('attachment');
+
+                if (array_key_exists($categoryId, $attachments)) {
+                    $attachment = $attachments[$categoryId];
+                    if ($categoryResult && $categoryResult->attachment) {
+                        // Hapus file lama jika ada
+                        Storage::delete($categoryResult->attachment);
+                    }
+
+                    // Simpan file baru dan dapatkan pathnya
+                    $attachmentPath = $attachment->store('uploads', 'public');
+                }
+            } else {
+                // Gunakan nilai attachment dari $categoryResult jika tidak ada file yang diunggah
+                $attachmentPath = $categoryResult ? $categoryResult->attachment : null;
+            } 
+             // Mengganti perbandingan ini dengan jumlah pertanyaan sebenarnya dalam kategori
+             $jumlahPertanyaan = Question::where('category_id', $categoryId)->count();
+
+             if ($number === $jumlahPertanyaan && $attachmentPath !='File attachment tidak diunggah.') {
+                 $feedback = $rawfeedback;
+             } else {
+                 $feedback = Feedback::find(1);
+             }
+
+            // Perbarui kategori hasil tes
+            if ($categoryResult) {
+                $categoryResult->update(['total_points' => $totalPoint, 'attachment' => $attachmentPath]);
+            } else {
+                $categoryResult = new CategoryResult([
+                    'total_points' => $totalPoints,
+                    'attachment' => $attachmentPath,
+                ]);
+                $categoryResult->result()->associate($result);
+                $categoryResult->feedback()->associate($feedback);
+                $categoryResult->category()->associate($categoryId);
+                $categoryResult->save();
+            }
+
+            foreach ($categoryQuestions as $question) {
+                $selectedOptionId = $selectedOptions[$question->id];
+                $selectedOption = Option::find($selectedOptionId);
+
+                // Temukan atau buat hasil pertanyaan yang sudah ada
+                $questionResult = QuestionResult::updateOrCreate(
+                    ['category_result_id' => $categoryResult->id, 'question_id' => $question->id],
+                    ['option_id' => $selectedOptionId, 'points' => $selectedOption->points]
+                );
+
+                // Perbarui hasil pertanyaan
+                $questionResult->update(['option_id' => $selectedOptionId, 'points' => $selectedOption->points]);
+            }
+        }
+
+        // Commit transaksi jika berhasil
+        DB::commit();
+
+        if ($request->aksi == "simpan") {
+            return redirect()->route('client.test.edit', $result);
+        }
+        if ($request->aksi == "kirim") {
+            return view('client.waiting');
+        }
+
+        //++++++++++++++++++++++++
+
         // Mulai transaksi database
         DB::beginTransaction();
 
         try {
-            // Perbarui total_points pada tabel hasil ujian
-            $totalPoints = Option::whereIn('id', array_values($selectedOptions))->sum('points');
-            $resultData->update(['total_points' => $totalPoints]);
-            $resultData->update(['status' => $request->aksi]);
-
-            foreach ($questionsByCategory as $categoryId => $categoryQuestions) {
-                $totalPoint = 0;
-
-                foreach ($categoryQuestions as $question) {
-                    $selectedOptionId = $selectedOptions[$question->id];
-                    $selectedOption = Option::find($selectedOptionId);
-                    $totalPoint += $selectedOption->points;
-                }
-
-                $feedback = Feedback::where('categori_id', $categoryId)
-                    ->where('min', '<=', $totalPoint)
-                    ->where('max', '>=', $totalPoint)
-                    ->first();
-
-                // Temukan atau buat kategori hasil ujian yang sudah ada
-                $categoryResult = CategoryResult::where('result_id', $result)
-                    ->where('category_id', $categoryId)
-                    ->first();
-
-                $attachmentPath = null;
-
-                if ($request->hasFile('attachment')) {
-                    $attachments = $request->file('attachment');
-
-                    if (array_key_exists($categoryId, $attachments)) {
-                        $attachment = $attachments[$categoryId];
-                        if ($categoryResult && $categoryResult->attachment) {
-                            // Hapus file lama jika ada
-                            Storage::delete($categoryResult->attachment);
-                        }
-
-                        // Simpan file baru dan dapatkan pathnya
-                        $attachmentPath = $attachment->store('uploads', 'public');
-                    }
-                } else {
-                    // Gunakan nilai attachment dari $categoryResult jika tidak ada file yang diunggah
-                    $attachmentPath = $categoryResult ? $categoryResult->attachment : null;
-                }
-
-                // Perbarui kategori hasil tes
-                if ($categoryResult) {
-                    $categoryResult->update(['total_points' => $totalPoint, 'attachment' => $attachmentPath]);
-                } else {
-                    $categoryResult = new CategoryResult([
-                        'total_points' => $totalPoints,
-                        'attachment' => $attachmentPath,
-                    ]);
-                    $categoryResult->result()->associate($result);
-                    $categoryResult->feedback()->associate($feedback);
-                    $categoryResult->category()->associate($categoryId);
-                    $categoryResult->save();
-                }
-
-                foreach ($categoryQuestions as $question) {
-                    $selectedOptionId = $selectedOptions[$question->id];
-                    $selectedOption = Option::find($selectedOptionId);
-
-                    // Temukan atau buat hasil pertanyaan yang sudah ada
-                    $questionResult = QuestionResult::updateOrCreate(
-                        ['category_result_id' => $categoryResult->id, 'question_id' => $question->id],
-                        ['option_id' => $selectedOptionId, 'points' => $selectedOption->points]
-                    );
-
-                    // Perbarui hasil pertanyaan
-                    $questionResult->update(['option_id' => $selectedOptionId, 'points' => $selectedOption->points]);
-                }
-            }
-
-            // Commit transaksi jika berhasil
-            DB::commit();
-
-            if ($request->aksi == "simpan") {
-                return redirect()->route('client.test.edit', $result);
-            }
-            if ($request->aksi == "kirim") {
-                return view('client.waiting');
-            }
+            
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
