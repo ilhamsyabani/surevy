@@ -160,6 +160,7 @@ class TestController extends Controller
 
             $categoryResult = new CategoryResult([
                 'total_points' => $totalPoints,
+                'status' => $request->aksi,
                 'attachment' => $path, // Misalnya, jika attachment juga disimpan dalam tabel category_result
             ]);
 
@@ -208,6 +209,13 @@ class TestController extends Controller
 
         // Mengelompokkan pertanyaan berdasarkan kategori soal
         $questionsByCategory = $questions->groupBy('category_id');
+
+        
+
+        // Mulai transaksi database
+        DB::beginTransaction();
+
+        try {
 
         //++++++++++++++++++++++++
         // Perbarui total_points pada tabel hasil ujian
@@ -305,11 +313,6 @@ class TestController extends Controller
         }
 
         //++++++++++++++++++++++++
-
-        // Mulai transaksi database
-        DB::beginTransaction();
-
-        try {
             
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
