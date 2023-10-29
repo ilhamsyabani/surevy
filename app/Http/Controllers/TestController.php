@@ -271,6 +271,7 @@ class TestController extends Controller
                 $categoryResult = new CategoryResult([
                     'total_points' => $totalPoints,
                     'attachment' => $attachmentPath,
+                    'status' => $request->aksi,
                 ]);
                 $categoryResult->result()->associate($result);
                 $categoryResult->feedback()->associate($feedback);
