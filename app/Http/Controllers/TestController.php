@@ -99,7 +99,7 @@ class TestController extends Controller
             $totalPoints = 0;
             $number = 0;
             $path = 'kosong';
-            $feedback =[];
+            $feedback = [];
 
             foreach ($categoryQuestions as $question) {
 
@@ -142,17 +142,17 @@ class TestController extends Controller
                     $path = $attachment->store('uploads', 'public');
                 } else {
                     // Pengguna mengunggah file attachment, tetapi tidak ada file yang sesuai dengan kategori
-                    $path ='File attachment tidak diunggah.';
+                    $path = 'File attachment tidak diunggah.';
                 }
             } else {
                 // Pengguna tidak mengunggah file attachment
-                $path ='File attachment tidak diunggah.';
+                $path = 'File attachment tidak diunggah.';
             }
 
             // Mengganti perbandingan ini dengan jumlah pertanyaan sebenarnya dalam kategori
             $jumlahPertanyaan = Question::where('category_id', $categoryId)->count();
 
-            if ($number === $jumlahPertanyaan && $path !='File attachment tidak diunggah.') {
+            if ($number === $jumlahPertanyaan && $path != 'File attachment tidak diunggah.') {
                 $feedback = $rawfeedback;
             } else {
                 $feedback = Feedback::find(1);
@@ -210,12 +210,7 @@ class TestController extends Controller
         // Mengelompokkan pertanyaan berdasarkan kategori soal
         $questionsByCategory = $questions->groupBy('category_id');
 
-        
 
-        // Mulai transaksi database
-        DB::beginTransaction();
-
-        try {
 
         //++++++++++++++++++++++++
         // Perbarui total_points pada tabel hasil ujian
@@ -244,7 +239,20 @@ class TestController extends Controller
                 ->where('category_id', $categoryId)
                 ->first();
 
-            $attachmentPath = $categoryResult->attachment;
+
+            if ($categoryResult) {
+                // Jika $categoryResult adalah objek yang valid
+                if ($categoryResult->attachment) {
+                    // Jika attachment ada dan tidak null
+                    $attachmentPath = $categoryResult->attachment;
+                } else {
+                    // Jika attachment null atau kosong
+                    $attachmentPath = 'File attachment tidak diunggah.';
+                }
+            } else {
+                // Jika $categoryResult null atau bukan objek yang valid
+                $attachmentPath = 'Data kategori hasil tidak valid.';
+            }
 
             if ($request->hasFile('attachment')) {
                 $attachments = $request->file('attachment');
@@ -262,19 +270,19 @@ class TestController extends Controller
             } else {
                 // Gunakan nilai attachment dari $categoryResult jika tidak ada file yang diunggah
                 $attachmentPath = $categoryResult ? $categoryResult->attachment : null;
-            } 
-             // Mengganti perbandingan ini dengan jumlah pertanyaan sebenarnya dalam kategori
-             $jumlahPertanyaan = Question::where('category_id', $categoryId)->count();
+            }
+            // Mengganti perbandingan ini dengan jumlah pertanyaan sebenarnya dalam kategori
+            $jumlahPertanyaan = Question::where('category_id', $categoryId)->count();
 
-             if ($number === $jumlahPertanyaan && $attachmentPath !='File attachment tidak diunggah.') {
-                 $feedback = $rawfeedback;
-             } else {
-                 $feedback = Feedback::find(1);
-             }
+            if ($number === $jumlahPertanyaan && $attachmentPath != 'File attachment tidak diunggah.') {
+                $feedback = $rawfeedback;
+            } else {
+                $feedback = Feedback::find(1);
+            }
 
             // Perbarui kategori hasil tes
             if ($categoryResult) {
-                $categoryResult->update(['total_points' => $totalPoint, 'attachment' => $attachmentPath]);
+                $categoryResult->update(['total_points' => $totalPoint, 'attachment' => $attachmentPath, 'status' => $request->aksi,]);
             } else {
                 $categoryResult = new CategoryResult([
                     'total_points' => $totalPoints,
@@ -313,7 +321,11 @@ class TestController extends Controller
         }
 
         //++++++++++++++++++++++++
-            
+
+        // Mulai transaksi database
+        DB::beginTransaction();
+
+        try {
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
