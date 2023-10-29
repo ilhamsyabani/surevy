@@ -50,7 +50,7 @@ class TestController extends Controller
             return redirect()->route('client.results.show', $result);
         }
         if ($result->status == "dikembalikan") {
-            return redirect()->route('client.results.show', $result);
+            return redirect()->route('client.test.revisi', $result);
         }
     }
 
@@ -68,6 +68,27 @@ class TestController extends Controller
             ->get();
 
         return view('client.edit', [
+            'result' => $result,
+            'categoriresult' => $categoryRes,
+            'resultquestion' => $resultquestion,
+            'categories' => $categories,
+        ]);
+    }
+
+    public function revisi($result_id)
+    {
+        $result = Result::whereHas('user', function ($query) {
+            $query->whereId(auth()->id());
+        })->findOrFail($result_id);
+
+        $categoryRes = CategoryResult::where('result_id', $result->id)->get();
+
+        $resultquestion = QuestionResult::whereIn('category_result_id', $categoryRes->pluck('id'))->get();
+
+        $categories = Category::whereHas('categoryQuestions')
+            ->get();
+
+        return view('client.revisi', [
             'result' => $result,
             'categoriresult' => $categoryRes,
             'resultquestion' => $resultquestion,

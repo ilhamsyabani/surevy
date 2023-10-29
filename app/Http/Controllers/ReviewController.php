@@ -11,22 +11,22 @@ use Illuminate\Http\RedirectResponse;
 
 class ReviewController extends Controller
 {
-   
+
     public function index(): View
     {
-       // Ambil ID instansi dari pengguna yang saat ini terautentikasi
-       $instanceId = auth()->user()->instansion_id;
-            
-       // Ambil hasil ujian berdasarkan ID instansi pengguna
+        // Ambil ID instansi dari pengguna yang saat ini terautentikasi
+        $instanceId = auth()->user()->instansion_id;
 
-       $results = Result::whereHas('user', function ($query) use ($instanceId) {
-           $query->where('instansion_id', $instanceId);
-       })->get();
+        // Ambil hasil ujian berdasarkan ID instansi pengguna
 
-       
-       
-       // Kembalikan hasil ke view atau lakukan operasi lainnya
-       return view('review.index', compact('results'));
+        $results = Result::whereHas('user', function ($query) use ($instanceId) {
+            $query->where('instansion_id', $instanceId);
+        })->get();
+
+
+
+        // Kembalikan hasil ke view atau lakukan operasi lainnya
+        return view('review.index', compact('results'));
     }
 
     public function create(): View
@@ -35,25 +35,43 @@ class ReviewController extends Controller
     }
 
     public function store(Request $request): RedirectResponse
-    {
-        
-        $review = new Review([
-            'category_result_id' => $request->result_id,
-            'user_id' => auth()->id(),
-            'review' => $request->review
-        ]);
+{
+    $reviewKeys = collect($request->review)->keys();
 
-        $review->save();
-        
-        $categoriResult = CategoryResult::find($request->result_id,);
-        dd($categoriResult);
-        
+    $validatedData = $request->validate([
+        'review.*' => 'required'
+    ], [
+        'review.*.required' => 'Review harus diisi.'
+    ]);
 
+    if ($validatedData) {
+        foreach ($request->review as $key => $reviewData) {
+            if ($reviewKeys->contains($key)) {
+                $review = new Review([
+                    'category_result_id' => $key, 
+                    'user_id' => auth()->id(),
+                    'review' => $reviewData
+                ]);
+                $review->save();
+            }
+        }
+
+        // Simpan status result
+        $result = Result::find($request->result_id);
+        $result->status = $request->status;
+        $result->save();
+
+        // Pengalihan halaman setelah data berhasil disimpan
         return redirect()->route('admin.review.index')->with([
             'message' => 'successfully created !',
             'alert-type' => 'success'
         ]);
+    } else {
+        // Respons jika validasi gagal
+        return back()->withInput()->withErrors(['review' => 'Review harus diisi.']);
     }
+}
+
 
     public function show($id): View
     {

@@ -19,59 +19,61 @@
                 </div>
             </div>
             <div class="card-body">
-                <p class="mt-5">Total points: {{ $result->total_points }} points</p>
-                @foreach ($result->categoryResults as $category)
-                    <hr>
-                    <h4 class="mt-4">Kategori: {{ $category->category->name }}</h4>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Question Text</th>
-                                <th>Points</th>
-                                <th style="text-align: center">Nilai</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $rowCount = count($category->questionResult);
-                            @endphp
-
-                            @foreach ($category->questionResult as $question)
+                <form action="{{ route('admin.review.store') }}" method="POST">
+                    @csrf
+                    <p class="mt-5">Total points: {{ $result->total_points }} points</p>
+                    @foreach ($result->categoryResults as $category)
+                        <hr>
+                        <h4 class="mt-4">Kategori: {{ $category->category->name }}</h4>
+                        <table class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <td>{{ $question->question->question_text }}</td>
-                                    <td>{{ $question->points }}</td>
-                                    @if ($loop->first)
-                                        <td rowspan="{{ $rowCount + 1 }}" style="text-align: center;">
-                                            <p style="font-size:100px">{{ $category->feedback->score }}</p>
-                                            <p>{{ $category->feedback->feedback }}</p>
-                                        </td>
-                                    @endif
+                                    <th>Question Text</th>
+                                    <th>Points</th>
+                                    <th style="text-align: center">Nilai</th>
                                 </tr>
-                            @endforeach
-                            <tr>
-                                <td>Jumlah</td>
-                                <td>{{ $category->total_points }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="mt-4">
-                        <p>file yang sudah di upload<a href="{{ asset('storage/' . $category->attachment) }}"
-                            class="pt-8 btn-link"
-                            download>{{ $category->attachment }}</a><br/></p>
-                    </div>
-                    <form action="{{ route('admin.review.store') }}" method="POST">
-                        @csrf
+                            </thead>
+                            <tbody>
+                                @php
+                                    $rowCount = count($category->questionResult);
+                                @endphp
+
+                                @foreach ($category->questionResult as $question)
+                                    <tr>
+                                        <td>{{ $question->question->question_text }}</td>
+                                        <td>{{ $question->points }}</td>
+                                        @if ($loop->first)
+                                            <td rowspan="{{ $rowCount + 1 }}" style="text-align: center;">
+                                                <p style="font-size:100px">{{ $category->feedback->score }}</p>
+                                                <p>{{ $category->feedback->feedback }}</p>
+                                            </td>
+                                        @endif
+                                    </tr>
+                                @endforeach
+                                <tr>
+                                    <td>Jumlah</td>
+                                    <td>{{ $category->total_points }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="mt-4">
+                            <p>file yang sudah di upload<a href="{{ asset('storage/' . $category->attachment) }}"
+                                    class="pt-8 btn-link" download>{{ $category->attachment }}</a><br /></p>
+                        </div>
+
                         <div class="mb-3">
                             <label for="exampleFormControlTextarea1" class="form-label">Tanggapan Evaluator</label>
-                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="review"></textarea>
+                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="review[{{$category->id}}]"></textarea>
                         </div>
-                        <input type="hidden" name="result_id" value="{{ $category->id }}">
-                        <div class="mb-4">
-                            <button type="submit" class="btn btn-primary" name="status" value="disetujui">Setujui</button>
-                            <button type="submit" class="btn btn-primary" name="status" value="dikembalikan">Kembalikan</button>
-                        </div>
-                    </form>
-                @endforeach
+                        
+                    @endforeach
+                    <div class="mb-4">
+                        <input type="hidden" name="result_id" value="{{  $result->id }}">
+                        <button type="submit" class="btn btn-primary" name="status" value="disetujui">Setujui</button>
+                        <button type="submit" class="btn btn-primary" name="status"
+                            value="dikembalikan">Kembalikan</button>
+                    </div>
+                </form>
             </div>
         </div>
         <!-- Content Row -->

@@ -27,6 +27,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('test', [\App\Http\Controllers\TestController::class, 'index'])->name('client.test');
     Route::get('test/{result_id}', [\App\Http\Controllers\TestController::class, 'edit'])->name('client.test.edit');
+    Route::get('test/{result_id}', [\App\Http\Controllers\TestController::class, 'revisi'])->name('client.test.revisi');
     Route::put('/test/{result}', [\App\Http\Controllers\TestController::class, 'update'])->name('client.test.update');
     Route::post('test', [\App\Http\Controllers\TestController::class, 'store'])->name('client.test.store');
     Route::get('results/{result_id}', [\App\Http\Controllers\ResultController::class, 'show'])->name('client.results.show');
