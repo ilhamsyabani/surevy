@@ -30,6 +30,7 @@
                     <p>{{ $category->name}}</p>
                 </div>
                 <hr>
+                <p>Keterangan dokumen : {{ $category->info }}</p>
                 <p>Rentang Nilai</p>
                 <table class="table table-bordered table-striped table-hover datatable datatable-category" cellspacing="0"
                     width="100%">

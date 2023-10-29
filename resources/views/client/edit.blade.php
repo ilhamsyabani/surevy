@@ -76,16 +76,19 @@
                                                 <div class="mt-4">
                                                     @foreach ($categoriresult->where('category_id', $category->id) as $result)
                                                         @if ($result->attachment)
-                                                            <p>file yang sudah di upload<a href="{{ asset('storage/' . $result->attachment) }}"
-                                                                class="pt-8 btn-link"
-                                                                download>{{ $result->attachment }}</a><br/></p>
+                                                            <p>file yang sudah di upload<a
+                                                                    href="{{ asset('storage/' . $result->attachment) }}"
+                                                                    class="pt-8 btn-link"
+                                                                    download>{{ $result->attachment }}</a><br /></p>
                                                         @endif
                                                     @endforeach
                                                     <label for="formFileMultiple" class="form-label">Masukan file
                                                         bukti</label>
                                                     <input class="form-control" type="file" id="formFileMultiple"
                                                         name="attachment[{{ $category->id }}]">
-                                                   
+                                                    <small id="emailHelp"
+                                                        class="form-text text-muted">*{{ $category->info }}, dengan ukuran
+                                                        file maximal 20MB</small>
                                                 </div>
                                             </div>
                                         </div>

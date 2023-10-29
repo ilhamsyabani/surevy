@@ -32,6 +32,11 @@
                         <input type="text" class="form-control" id="name" placeholder="name" name="name"
                             value="{{ old('name', $category->name) }}" />
                     </div>
+                    <div class="form-group">
+                        <label for="info">Informasi file bukti</label>
+                        <input type="text" class="form-control" id="info" placeholder="bukti berupa dokumen peserta didik" name="info"
+                            value="{{ old('info', $category->info) }}" />
+                    </div>
                     <hr>
                     <p>Rentang Nilai</p>
                     @foreach ($feedbacks as $index => $feedback)

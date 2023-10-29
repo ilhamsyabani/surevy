@@ -30,6 +30,10 @@
                     <label for="name">{{ __('Kategori') }}</label>
                     <input type="text" class="form-control" id="name" placeholder="{{ __('') }}" name="name" value="{{ old('name') }}" />
                 </div>
+                <div class="form-group">
+                    <label for="name">{{ __('Informasi file bukti') }}</label>
+                    <input type="text" class="form-control" id="info" placeholder="{{ __('') }}" name="info" value="{{ old('info') }}" />
+                </div>
                 <hr>
                 <p>Rentang Nilai</p>
                 @for ($i = 0; $i < 4; $i++)

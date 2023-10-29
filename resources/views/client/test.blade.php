@@ -65,6 +65,7 @@
                                                     <label for="formFile" class="form-label">Masukan file bukti</label>
                                                     <input class="form-control" type="file" id="formFile"
                                                         name="attachment[{{ $category->id }}]">
+                                                        <small id="emailHelp" class="form-text text-muted">*{{ $category->info }}, dengan ukuran file maximal 20MB</small>
                                                 </div>
                                             </div>
                                         </div>

@@ -43,6 +43,7 @@ class CategoryController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+
         $categori = Category::create($request->validated());
         $ranges = [];
 
@@ -78,6 +79,7 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'info' => 'required|string|max:255',
             'score.*' => 'required|string|max:255',
             'min.*' => 'required|integer',
             'max.*' => 'required|integer',
@@ -100,7 +102,7 @@ class CategoryController extends Controller
             $feedbackRanges[] = ['min' => $min, 'max' => $max];
         }
 
-        $category->update(['name' => $request->input('name')]);
+        $category->update(['name' => $request->input('name'), 'info' => $request->input('info')]);
 
         foreach ($request->input('score') as $key => $score) {
             $min = $request->input('min')[$key];
