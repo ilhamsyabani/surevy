@@ -87,8 +87,7 @@
                                                     <input class="form-control" type="file" id="formFileMultiple"
                                                         name="attachment[{{ $category->id }}]">
                                                     <small id="emailHelp"
-                                                        class="form-text text-muted">*{{ $category->info }}, dengan ukuran
-                                                        file maximal 20MB</small>
+                                                        class="form-text text-muted">*{{ $category->info }}, dengan batasan ukuran file maksimal 20MB</small>
                                                 </div>
                                             </div>
                                         </div>
