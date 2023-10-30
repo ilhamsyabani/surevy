@@ -69,7 +69,7 @@
                                             <div class="card mb-4 bg-light">
                                                 <div class="card-body">
                                                     <h5 class="card-title">Feedback dari Reviewer:</h5>
-                                                    <p class="card-text">{{ optional($result->review)->review }}</p>
+                                                    <p class="card-text">{{ optional($result)->review }}</p>
                                                 </div>
                                             </div>
                                             

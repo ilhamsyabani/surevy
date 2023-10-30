@@ -45,8 +45,11 @@
                                 <td>{{ $result->status }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
+                                        <a href="{{ route('admin.review.edit', $result->id) }}" class="btn btn-primary">
+                                           Berikan Review
+                                        </a>
                                         <a href="{{ route('admin.review.show', $result->id) }}" class="btn btn-success">
-                                            <i class="fa fa-eye"></i>
+                                            lihat hasil
                                         </a>
                                     </div>
                                 </td>

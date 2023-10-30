@@ -14,6 +14,7 @@ class CategoryResult extends Model
     protected $fillable = [
         'total_points',
         'attachment',
+        'review'
     ];
 
     public function result()

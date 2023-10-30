@@ -1,50 +1,80 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
 
-    <!-- Page Heading -->
-    @if($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+        <!-- Page Heading -->
 
-<!-- Content Row -->
-        <div class="card shadow">
-            <div class="card-header">
-                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">{{ __('edit result')}}</h1>
-                    <a href="{{ route('admin.results.index') }}" class="btn btn-primary btn-sm shadow-sm">{{ __('Go Back') }}</a>
+
+        <!-- Content Row -->
+        <div class="card">
+            <div class="card-header py-3 d-flex">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    Total points: {{ $result->total_points }} points
+                </h6>
+                <div class="ml-auto">
+                    <a href="{{ route('admin.results.index') }}" class="btn btn-primary">
+                        <span class="text">{{ __('Go Back') }}</span>
+                    </a>
                 </div>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.results.update', $result->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.review.store') }}" method="POST">
                     @csrf
-                    @method('put')
-                    <div class="form-group">
-                        <label for="question">{{ __('question') }}</label>
-                        <select class="form-control" name="questions[]" multiple id="question">
-                            @foreach($questions as $id => $question)
-                                <option {{ (in_array($id, old('questions', [])) || isset($result) && $result->questions->contains($id)) ? 'selected' : '' }} value="{{ $id }}">{{ $question }}</option>
-                            @endforeach
-                        </select>
+                    <p class="mt-5">Total points: {{ $result->total_points }} points</p>
+                    @foreach ($result->categoryResults as $category)
+                        <hr>
+                        <h4 class="mt-4">Kategori: {{ $category->category->name }}</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Question Text</th>
+                                    <th>Points</th>
+                                    <th style="text-align: center">Nilai</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $rowCount = count($category->questionResult);
+                                @endphp
+
+                                @foreach ($category->questionResult as $question)
+                                    <tr>
+                                        <td>{{ $question->question->question_text }}</td>
+                                        <td>{{ $question->points }}</td>
+                                        @if ($loop->first)
+                                            <td rowspan="{{ $rowCount + 1 }}" style="text-align: center;">
+                                                <p style="font-size:100px">{{ $category->feedback->score }}</p>
+                                                <p>{{ $category->feedback->feedback }}</p>
+                                            </td>
+                                        @endif
+                                    </tr>
+                                @endforeach
+                                <tr>
+                                    <td>Jumlah</td>
+                                    <td>{{ $category->total_points }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="mt-4">
+                            <p>file yang sudah di upload<a href="{{ asset('storage/' . $category->attachment) }}"
+                                    class="pt-8 btn-link" download>{{ $category->attachment }}</a><br /></p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="review" class="form-label">Example textarea</label>
+                            <textarea class="form-control" id="review" rows="3" name="review[{{ $category->id }}]">{{ $category->review}}</textarea>
+                        </div>
+                    @endforeach
+                    <div class="mb-4">
+                        <input type="hidden" name="result_id" value="{{ $result->id }}">
+                        <button type="submit" class="btn btn-primary" name="status" value="disetujui">Setujui</button>
+                        <button type="submit" class="btn btn-primary" name="status"
+                            value="dikembalikan">Kembalikan</button>
                     </div>
-                    <div class="form-group">
-                        <label for="total_points">{{ __('total_points') }}</label>
-                        <input type="number" class="form-control" id="total_points" placeholder="{{ __('total_points') }}" name="total_points" value="{{ old('total_points', $result->total_points) }}" />
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">{{ __('Save')}}</button>
                 </form>
             </div>
         </div>
-    
+        <!-- Content Row -->
 
-    <!-- Content Row -->
-
-</div>
+    </div>
 @endsection

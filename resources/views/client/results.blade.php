@@ -48,7 +48,7 @@
                             </div>
                             <div class="card-header">Feedback dari reviewer</div>
                             <div class="card-body mb-4" style="background-color:#eefdee;">
-                                <p>{{optional($category->review)->review}}</p>
+                                <p>{{optional($category)->review}}</p>
                             </div>
                         @endforeach
                     </div>

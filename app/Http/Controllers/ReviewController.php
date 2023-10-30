@@ -35,42 +35,39 @@ class ReviewController extends Controller
     }
 
     public function store(Request $request): RedirectResponse
-{
-    $reviewKeys = collect($request->review)->keys();
-
-    $validatedData = $request->validate([
-        'review.*' => 'required'
-    ], [
-        'review.*.required' => 'Review harus diisi.'
-    ]);
-
-    if ($validatedData) {
-        foreach ($request->review as $key => $reviewData) {
-            if ($reviewKeys->contains($key)) {
-                $review = new Review([
-                    'category_result_id' => $key, 
-                    'user_id' => auth()->id(),
-                    'review' => $reviewData
-                ]);
-                $review->save();
-            }
-        }
-
-        // Simpan status result
-        $result = Result::find($request->result_id);
-        $result->status = $request->status;
-        $result->save();
-
-        // Pengalihan halaman setelah data berhasil disimpan
-        return redirect()->route('admin.review.index')->with([
-            'message' => 'successfully created !',
-            'alert-type' => 'success'
+    {
+        // Validasi data ulasan
+        $validatedData = $request->validate([
+            'review.*' => 'required'
+        ], [
+            'review.*.required' => 'Review harus diisi.'
         ]);
-    } else {
-        // Respons jika validasi gagal
-        return back()->withInput()->withErrors(['review' => 'Review harus diisi.']);
+
+        if ($validatedData) {
+            foreach ($request->review as $key => $reviewData) {
+                // Perbarui atau buat ulasan berdasarkan category_result_id
+                $categoryResult = CategoryResult::updateOrCreate(
+                    ['id' => $key], // Gunakan id sebagai kunci utama
+                    ['review' => $reviewData]
+                );
+            }
+
+            // Simpan status result
+            $result = Result::find($request->result_id);
+            $result->status = $request->status;
+            $result->save();
+
+            // Pengalihan halaman setelah data berhasil disimpan
+            return redirect()->route('admin.review.index')->with([
+                'message' => 'Data berhasil disimpan!',
+                'alert-type' => 'success'
+            ]);
+        } else {
+            // Respons jika validasi gagal
+            return back()->withInput()->withErrors(['review' => 'Review harus diisi.']);
+        }
     }
-}
+
 
 
     public function show($id): View
@@ -79,20 +76,46 @@ class ReviewController extends Controller
         return view('review.show', compact('result'));
     }
 
-    public function edit(Review $review): View
+    public function edit($id): View
     {
-        return view('reviews.edit', compact('review'));
+        $result = Result::find($id);
+        return view('review.edit', compact('result'));
     }
 
-    public function update(Request $request, Review $review): RedirectResponse
+    public function update(Request $request, CategoryResult $chategoryResult): RedirectResponse
     {
-        $review->update($request->validated());
-
-        return redirect()->route('reviews.index')->with([
-            'message' => 'successfully updated !',
-            'alert-type' => 'info'
+        dd($chategoryResult);
+        $validatedData = $request->validate([
+            'review.*' => 'required'
+        ], [
+            'review.*.required' => 'Review harus diisi.'
         ]);
+
+        if ($validatedData) {
+            foreach ($request->review as $key => $reviewData) {
+                // Perbarui atau buat ulasan berdasarkan category_result_id
+                $review = Review::updateOrCreate(
+                    ['category_result_id' => $key],
+                    ['user_id' => auth()->id(), 'review' => $reviewData]
+                );
+            }
+
+            // Simpan status result
+            $result = Result::find($request->result_id);
+            $result->status = $request->status;
+            $result->save();
+
+            // Pengalihan halaman setelah data berhasil disimpan
+            return redirect()->route('admin.review.index')->with([
+                'message' => 'Data berhasil disimpan!',
+                'alert-type' => 'success'
+            ]);
+        } else {
+            // Respons jika validasi gagal
+            return back()->withInput()->withErrors(['review' => 'Review harus diisi.']);
+        }
     }
+
 
     public function destroy(Review $review): RedirectResponse
     {
