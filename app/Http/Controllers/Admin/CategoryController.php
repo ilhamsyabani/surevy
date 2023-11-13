@@ -79,7 +79,7 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'info' => 'required|string|max:255',
+            'info' => 'required|string|max:500',
             'score.*' => 'required|string|max:255',
             'min.*' => 'required|integer',
             'max.*' => 'required|integer',
