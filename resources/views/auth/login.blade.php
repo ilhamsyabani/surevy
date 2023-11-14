@@ -58,6 +58,7 @@
                                 @csrf
                                 <div class="row gy-3 gy-md-4 overflow-hidden">
                                     <div class="col-12">
+                                        <label for="label">email</label>
                                         <input id="email" type="email"
                                             class="form-control @error('email') is-invalid @enderror" name="email"
                                             value="{{ old('email') }}" required autocomplete="email" autofocus>
@@ -68,6 +69,7 @@
                                         @enderror
                                     </div>
                                     <div class="col-12">
+                                        <label for="password">password</label>
                                         <input id="password" type="password"
                                             class="form-control @error('password') is-invalid @enderror" name="password"
                                             required autocomplete="current-password">
