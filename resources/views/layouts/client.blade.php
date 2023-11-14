@@ -25,9 +25,11 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <h3 class="mx-auto text-center">  
+                   
+                <h3 class="mx-auto text-center">
                     <a class="nav-link text-center" href="{{ route('client.test') }}">
-                        {{ __('Start Test') }}
+                        <img src="{{ asset('backend/img/logo.png') }}" style="width: 48px;"
+                    alt="logo">
                     </a></h3>
                 <h5 class="mx-auto text-center d-flex">  
                     @auth
